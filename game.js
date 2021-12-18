@@ -1,7 +1,7 @@
 /*
     1. function computerPlay(): randomly returns rock, paper, or scissor
     2. function playRound(you, computer): determines who wins (handles corner cases)
-    3. function game(): repeats game 5 times, keep track of score and see who wins at the end
+    3. function game(): keeps playing until either you or the computer gets to 5 pts first
 */
 
 function computerPlay() {
@@ -39,37 +39,42 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
-
 async function game(){
     let human = 0, machine = 0;
-    for (i = 0; i < 5; i++){
-        let user = prompt("Enter your choice of Rock, Paper, or Scissor"), computer = computerPlay()
-        console.log("Computer has a " + computer)
-        await sleep(1000)
-        if (user != "rock" && user != "paper" && user != "scissor"){
-            console.log("Invalid Input. Try Again!")
-            i--;
-            continue
-        }
-        else if (computer.toLowerCase() === user.toLowerCase()){
-            console.log("You both have the same thing. Try Again.")
-            i--;
-            continue
-        }
-        else if (playRound(user, computer))
-            human += 1
-        else    machine += 1
-        console.log("You have a " + user)
-        console.log("Score: You: " + human + "  Computer: " + machine)
-        await sleep(3000)
-    }
-    if (human > machine){
-        console.log("You win!")
-    }
-    else if (human < machine)
-        console.log("You lose!")
-    else    console.log("Tie!")
+    const container = document.querySelector('body');
+    const btn = document.querySelectorAll('button');
+    const robot = document.createElement('div');
+    const you = document.createElement('div');
+    const score = document.createElement('h3');
+    const res = document.createElement('h2');
+    res.style.color = "red";
+    container.appendChild(you);
+    container.appendChild(robot);
+    container.appendChild(score);
+    container.appendChild(res);
+    btn.forEach((button) => {
+        let computer = computerPlay(), humanChoice;
+        button.addEventListener("click", async () => {
+            humanChoice = button.textContent;
+            if (human < 5 && machine < 5){
+                await sleep(100);
+                robot.textContent = "Computer has a " + computer;
+                you.textContent = "You have a " + humanChoice;
+                if (humanChoice.toLowerCase() != computer.toLowerCase()){
+                    if (playRound(humanChoice, computer))
+                        human++;
+                    else    machine++;
+                    if (human === 5 && machine < 5){
+                        res.textContent = "You win! Congrats";
+                    }
+                    else if (human < 5 && machine === 5){
+                        res.textContent = "You lose!";
+                    }
+                }
+                score.textContent = "You: " + human + " Computer: " + machine;
+            }
+        });
+    });
 }
 
 game()
